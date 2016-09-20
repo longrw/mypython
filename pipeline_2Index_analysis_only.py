@@ -49,12 +49,12 @@ class Seq:
             cfdnaR2 = self.rawname.replace('R1','R2')
             gdnaR1 = ''.join(filter(lambda x: re.match(r'(^S\d+)[-_]'+self.match[1]+'[-_]gdna[-_]'+self.panel_type+'(.+)(R1_001.fastq.gz|R1_001.fastq)$', x), os.listdir("./")))
             gdnaR2 = ''.join(filter(lambda x: re.match(r'(^S\d+)[-_]'+self.match[1]+'[-_]gdna[-_]'+self.panel_type+'(.+)(R2_001.fastq.gz|R2_001.fastq)$', x), os.listdir("./")))
-            if os.path.exists(cfdnaR1) and os.path.exists(cfdnaR2) and os.path.exists(gdnaR1) and os.path.exists(gdnaR2):
-                Rs = [(cfdnaR1, cfdnaR2), (gdnaR1, gdnaR2)]
-                p = Pool()
-                p.map(after, Rs)
-                p.close()
-                p.join()
+#            if os.path.exists(cfdnaR1) and os.path.exists(cfdnaR2) and os.path.exists(gdnaR1) and os.path.exists(gdnaR2):
+#                Rs = [(cfdnaR1, cfdnaR2), (gdnaR1, gdnaR2)]
+#                p = Pool()
+#                p.map(after, Rs)
+#                p.close()
+#                p.join()
             cfdnaR1_good = self.rawfq_path + '/good/' + cfdnaR1.split('.')[0] + '.good.fq'
             cfdnaR2_good = self.rawfq_path + '/good/' + cfdnaR2.split('.')[0] + '.good.fq'
             gdnaR1_good = self.rawfq_path + '/good/' + gdnaR1.split('.')[0] + '.good.fq'
@@ -70,8 +70,8 @@ class Seq:
         if self.sample_type in ["ffpedna", "pedna", "fnadna", "saldna", "tisdna"]:
             dnaR1 = self.rawname
             dnaR2 = self.rawname.replace('R1','R2')
-            if os.path.exists(dnaR1) and os.path.exists(dnaR2):
-                after((dnaR1, dnaR2))
+#            if os.path.exists(dnaR1) and os.path.exists(dnaR2):
+#                after((dnaR1, dnaR2))
             dnaR1_good = self.rawfq_path + '/good/' + dnaR1.split('.')[0] + '.good.fq'
             dnaR2_good = self.rawfq_path + '/good/' + dnaR2.split('.')[0] + '.good.fq'
             dna_prefix = self.match[0]
@@ -99,9 +99,9 @@ def main():
     if 'NS500713' in rawseq_path:
         os.system("bcl2fastq -r 72 -d 72 -p 72 -w 72 -o " + rawfq_path + " --barcode-mismatches=0 --no-lane-splitting")
         logging.info("\nBcl2fastq CMD: bcl2fastq -r 72 -d 72 -p 72 -w 72 -o {0} --barcode-mismatches=0 --no-lane-splitting\n{1}".format(rawfq_path,"#"*50))
-    if 'ST-E' in rawseq_path:
-        os.system("bcl2fastq -r 72 -d 72 -p 72 -w 72 -o " + rawfq_path + " --tiles s_7 --barcode-mismatches=0")
-        logging.info("\nBcl2fastq CMD: bcl2fastq -r 72 -d 72 -p 72 -w 72 -o {0} --tiles s_7 --barcode-mismatches=0\n{1}".format(rawfq_path,"#"*50))
+#    if 'ST-E' in rawseq_path:
+#        os.system("bcl2fastq -r 72 -d 72 -p 72 -w 72 -o " + rawfq_path + " --tiles s_7 --barcode-mismatches=0")
+#        logging.info("\nBcl2fastq CMD: bcl2fastq -r 72 -d 72 -p 72 -w 72 -o {0} --tiles s_7 --barcode-mismatches=0\n{1}".format(rawfq_path,"#"*50))
     os.chdir(rawfq_path)
     double_index = '{0}/fqsamplesheet.csv'.format(rawseq_path)
     if os.path.exists(double_index):
@@ -116,21 +116,19 @@ def main():
     p.close()
     p.join()
     # after again
-    os.chdir(rawfq_path)
-    good_dir = '{0}/good'.format(rawfq_path)
-    if not os.path.exists(good_dir):os.mkdir(good_dir)
-    r1_lst = filter(lambda x: re.match(r'(^S\d+)(.+)(_R1)(_001.fastq|_001.fastq.gz)', x), os.listdir("./"))
-    r1_good_lst = filter(lambda x: re.match(r'(^S\d+)(.+)(_R1)(_001.good.fq|_001.good.fq.gz)', x), os.listdir("./good"))
-    r1_good_lst_ID = [f.split('.')[0] for f in r1_good_lst]
-    rs = []
-    for r1 in r1_lst:
-        if r1.split('.')[0] not in r1_good_lst_ID:
-            r2 = r1.replace('R1','R2')
-            rs.append((r1,r2))
-    a = Pool()
-    a.map(after, rs)
-    a.close()
-    a.join()
+#    os.chdir(rawfq_path)
+#    r1_lst = filter(lambda x: re.match(r'(^S\d+)(.+)(_R1)(_001.fastq|_001.fastq.gz)', x), os.listdir("./"))
+#    r1_good_lst = filter(lambda x: re.match(r'(^S\d+)(.+)(_R1)(_001.good.fq|_001.good.fq.gz)', x), os.listdir("./good"))
+#    r1_good_lst_ID = [f.split('.')[0] for f in r1_good_lst]
+#    rs = []
+#    for r1 in r1_lst:
+#        if r1.split('.')[0] not in r1_good_lst_ID:
+#            r2 = r1.replace('R1','R2')
+#            rs.append((r1,r2))
+#    a = Pool()
+#    a.map(after, rs)
+#    a.close()
+#    a.join()
     # single sampleQC
 #    os.system("python /haplox/users/longrw/mypython/single_sampleQC.py -1 ")
     logging.info("\n{0}".format('The great pipeline has been successful!!!\n'*3))
