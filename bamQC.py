@@ -5,18 +5,18 @@ import sys
 from multiprocessing import Pool
 
 def bam(args):
-    inpath,bed,exonbed,t,ref,R1,R2,sampleID,outpath = args[0],args[1],args[2],args[3],args[4],args[5],args[6],args[7],args[8]
-    sam          = "%s/%s.sam" % (inpath,sampleID)
-    bam_sort     = "%s/%s_sort.bam" % (inpath,sampleID)
-    bam_mark     = "%s/%s_mark.bam" % (inpath,sampleID)
-    cov_sort     = "%s/%s_sort.txt" % (outpath,sampleID)
-    cov_mark     = "%s/%s_mark.txt" % (outpath,sampleID)
-    mapq_value   = "%s/%s_mapq.txt" % (outpath,sampleID)
-    temp_len     = "%s/%s_templen.txt" % (outpath,sampleID)
-    map_sort     = "%s/%s_sort.maptxt" % (outpath,sampleID)
-    map_mark     = "%s/%s_mark.maptxt" % (outpath,sampleID)
-    stats        = "%s/%s_stats.txt" % (outpath,sampleID)
-    read_len     = "%s/%s_readlen.txt" % (outpath,sampleID)
+    inpath, bed, exonbed, t, ref, R1, R2, sampleID, outpath = args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8]
+    sam = "%s/%s.sam" % (inpath,sampleID)
+    bam_sort = "%s/%s_sort.bam" % (inpath,sampleID)
+    bam_mark = "%s/%s_mark.bam" % (inpath,sampleID)
+    cov_sort = "%s/%s_sort.txt" % (outpath,sampleID)
+    cov_mark = "%s/%s_mark.txt" % (outpath,sampleID)
+    mapq_value = "%s/%s_mapq.txt" % (outpath,sampleID)
+    temp_len = "%s/%s_templen.txt" % (outpath,sampleID)
+    map_sort = "%s/%s_sort.maptxt" % (outpath,sampleID)
+    map_mark = "%s/%s_mark.maptxt" % (outpath,sampleID)
+    stats = "%s/%s_stats.txt" % (outpath,sampleID)
+    read_len = "%s/%s_readlen.txt" % (outpath,sampleID)
     AGCT_content = "%s/%s_AGCT.txt" % (outpath,sampleID)
     capture_sort = "{0}/{1}_sort_capture_stat.txt".format(outpath,sampleID)
     capture_mark = "{0}/{1}_mark_capture_stat.txt".format(outpath,sampleID)
@@ -45,7 +45,9 @@ def bam(args):
         os.system("pypy /haplox/users/longrw/mypython/check_capture_percentage.py -b {0} -i {1} -o {2}".format(bed,bam_mark,outpath))
 
 def cfdna2gdna():
-    inpath,bed,exonbed,t,ref,gR1,gR2,gID,cfR1,cfR2,cfID = sys.argv[1],sys.argv[2],sys.argv[3],sys.argv[4],sys.argv[5],sys.argv[6],sys.argv[7],sys.argv[8],sys.argv[9],sys.argv[10],sys.argv[11]
+    (inpath, bed, exonbed, t, ref, gR1, gR2, gID, cfR1, cfR2, cfID) = (sys.argv[1],
+            sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6],
+            sys.argv[7], sys.argv[8], sys.argv[9], sys.argv[10], sys.argv[11])
 #    bamQC_dir = "%s/BamQC" % inpath
 #    if not os.path.exists(bamQC_dir):os.mkdir(bamQC_dir)
     outpath = "{0}/BamQC".format(inpath)
@@ -57,25 +59,25 @@ def cfdna2gdna():
     p.join()
 #    bam(inpath,bed,exonbed,t,ref,gR1,gR2,gID,outpath)
 #    bam(inpath,bed,exonbed,t,ref,cfR1,cfR2,cfID,outpath)
-    gdna_sort_cov      = "%s/%s_sort.txt" % (outpath,gID)
-    gdna_mark_cov      = "%s/%s_mark.txt" % (outpath,gID)
-    cfdna_sort_cov     = "%s/%s_sort.txt" % (outpath,cfID)
-    cfdna_mark_cov     = "%s/%s_mark.txt" % (outpath,cfID)
-    cfdna_mapq_value   = "%s/%s_mapq.txt" % (outpath,cfID)
-    gdna_mapq_value    = "%s/%s_mapq.txt" % (outpath,gID)
-    cfdna_templen      = "%s/%s_templen.txt" % (outpath,cfID)
-    gdna_templen       = "%s/%s_templen.txt" % (outpath,gID)
-    gdna_sort_map      = "%s/%s_sort.maptxt" % (outpath,gID)
-    gdna_mark_map      = "%s/%s_mark.maptxt" % (outpath,gID)
-    cfdna_sort_map     = "%s/%s_sort.maptxt" % (outpath,cfID)
-    cfdna_mark_map     = "%s/%s_mark.maptxt" % (outpath,cfID)
-    gdna_read_content  = "{0}/{1}_AGCT.txt".format(outpath,gID)
+    gdna_sort_cov = "%s/%s_sort.txt" % (outpath,gID)
+    gdna_mark_cov = "%s/%s_mark.txt" % (outpath,gID)
+    cfdna_sort_cov = "%s/%s_sort.txt" % (outpath,cfID)
+    cfdna_mark_cov = "%s/%s_mark.txt" % (outpath,cfID)
+    cfdna_mapq_value = "%s/%s_mapq.txt" % (outpath,cfID)
+    gdna_mapq_value = "%s/%s_mapq.txt" % (outpath,gID)
+    cfdna_templen = "%s/%s_templen.txt" % (outpath,cfID)
+    gdna_templen = "%s/%s_templen.txt" % (outpath,gID)
+    gdna_sort_map = "%s/%s_sort.maptxt" % (outpath,gID)
+    gdna_mark_map = "%s/%s_mark.maptxt" % (outpath,gID)
+    cfdna_sort_map = "%s/%s_sort.maptxt" % (outpath,cfID)
+    cfdna_mark_map = "%s/%s_mark.maptxt" % (outpath,cfID)
+    gdna_read_content = "{0}/{1}_AGCT.txt".format(outpath,gID)
     cfdna_read_content = "{0}/{1}_AGCT.txt".format(outpath,cfID)
-    cov_info           = "%s/covInfo.csv" % outpath
-    mapq_png           = "%s/mapping_quality_distribution-MAPQ.png" % outpath
-    templen_png        = "%s/template_length_distribution.png" % outpath
-    map_info           = "%s/mapInfo.csv" % outpath
-    gene_target_list   = "/haplox/users/longrw/myR/files/gene_target_list.txt"
+    cov_info = "%s/covInfo.csv" % outpath
+    mapq_png = "%s/mapping_quality_distribution-MAPQ.png" % outpath
+    templen_png = "%s/template_length_distribution.png" % outpath
+    map_info = "%s/mapInfo.csv" % outpath
+    gene_target_list = "/haplox/users/longrw/myR/files/gene_target_list.txt"
     gene_target_points = "/haplox/users/longrw/myR/files/gene_target_points.txt"
     os.system("Rscript /haplox/users/longrw/myR/cov_group_exon.R %s %s %s %s" % (exonbed,gene_target_points,gene_target_list,outpath))
     os.system("python /haplox/users/longrw/mypython/cov.py %s %s %s %s > %s" % (gdna_sort_cov,gdna_mark_cov,cfdna_sort_cov,cfdna_mark_cov,cov_info))
@@ -91,25 +93,26 @@ def cfdna2gdna():
     os.system("rm -rf %s/*_templen.txt" % outpath)
 
 def ffpe():
-    inpath,bed,exonbed,t,ref,R1,R2,sampleID = sys.argv[1],sys.argv[2],sys.argv[3],sys.argv[4],sys.argv[5],sys.argv[6],sys.argv[7],sys.argv[8]
+    (inpath,bed,exonbed,t,ref,R1,R2,sampleID) = (sys.argv[1],
+            sys.argv[2],sys.argv[3],sys.argv[4],sys.argv[5],sys.argv[6],sys.argv[7],sys.argv[8])
 #    bamQC_dir = "%s/BamQC" % inpath
 #    if not os.path.exists(bamQC_dir):os.mkdir(bamQC_dir)
     outpath = "{0}/BamQC".format(inpath)
     if not os.path.exists(outpath):os.mkdir(outpath)
     bam((inpath,bed,exonbed,t,ref,R1,R2,sampleID,outpath))
-    cov_sort     = "%s/%s_sort.txt" % (outpath,sampleID)
-    cov_mark     = "%s/%s_mark.txt" % (outpath,sampleID)
-    mapq_value   = "%s/%s_mapq.txt" % (outpath,sampleID)
-    temp_len     = "%s/%s_templen.txt" % (outpath,sampleID)
-    map_sort     = "%s/%s_sort.maptxt" % (outpath,sampleID)
-    map_mark     = "%s/%s_mark.maptxt" % (outpath,sampleID)
+    cov_sort = "%s/%s_sort.txt" % (outpath,sampleID)
+    cov_mark = "%s/%s_mark.txt" % (outpath,sampleID)
+    mapq_value = "%s/%s_mapq.txt" % (outpath,sampleID)
+    temp_len = "%s/%s_templen.txt" % (outpath,sampleID)
+    map_sort = "%s/%s_sort.maptxt" % (outpath,sampleID)
+    map_mark = "%s/%s_mark.maptxt" % (outpath,sampleID)
     read_content = "{0}/{1}_AGCT.txt".format(outpath,sampleID)
-    cov_info     = "%s/covInfo.csv" % outpath
-    mapq_png     = "%s/mapping_quality_distribution-MAPQ.png" % outpath
-    templen_png  = "%s/template_length_distribution.png" % outpath
-    map_info     = "%s/mapInfo.csv" % outpath
+    cov_info = "%s/covInfo.csv" % outpath
+    mapq_png = "%s/mapping_quality_distribution-MAPQ.png" % outpath
+    templen_png = "%s/template_length_distribution.png" % outpath
+    map_info = "%s/mapInfo.csv" % outpath
     gene_target_points = "/haplox/users/longrw/myR/files/gene_target_points.txt"
-    gene_target_list   = "/haplox/users/longrw/myR/files/gene_target_list.txt"
+    gene_target_list = "/haplox/users/longrw/myR/files/gene_target_list.txt"
     os.system("Rscript /haplox/users/longrw/myR/cov_group_exon.R %s %s %s %s" % (exonbed,gene_target_points,gene_target_list,outpath))
     os.system("python /haplox/users/longrw/mypython/cov_ffpe.py %s %s > %s" % (cov_sort,cov_mark,cov_info))
     os.system("Rscript /haplox/users/longrw/myR/depth_cov_ffpe.R %s %s" % (outpath,sampleID))
