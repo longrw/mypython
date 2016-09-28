@@ -96,17 +96,17 @@ def main():
         os.mkdir(rawout_path)
     logging.info("\nRawseq path: {0}\nRawfq  path: {1}\nRawout path: {2}\n{3}".format(rawseq_path,rawfq_path,rawout_path,"#"*50))
     # bcl2fastq
-    if 'NS500713' in rawseq_path:
-        os.system("bcl2fastq -r 72 -d 72 -p 72 -w 72 -o " + rawfq_path + " --barcode-mismatches=0 --no-lane-splitting")
-        logging.info("\nBcl2fastq CMD: bcl2fastq -r 72 -d 72 -p 72 -w 72 -o {0} --barcode-mismatches=0 --no-lane-splitting\n{1}".format(rawfq_path,"#"*50))
+#    if 'NS500713' in rawseq_path:
+#        os.system("bcl2fastq -r 72 -d 72 -p 72 -w 72 -o " + rawfq_path + " --barcode-mismatches=0 --no-lane-splitting")
+#        logging.info("\nBcl2fastq CMD: bcl2fastq -r 72 -d 72 -p 72 -w 72 -o {0} --barcode-mismatches=0 --no-lane-splitting\n{1}".format(rawfq_path,"#"*50))
 #    if 'ST-E' in rawseq_path:
 #        os.system("bcl2fastq -r 72 -d 72 -p 72 -w 72 -o " + rawfq_path + " --tiles s_7 --barcode-mismatches=0")
 #        logging.info("\nBcl2fastq CMD: bcl2fastq -r 72 -d 72 -p 72 -w 72 -o {0} --tiles s_7 --barcode-mismatches=0\n{1}".format(rawfq_path,"#"*50))
     os.chdir(rawfq_path)
-    double_index = '{0}/fqsamplesheet.csv'.format(rawseq_path)
-    if os.path.exists(double_index):
-        os.system("/haplox/users/longrw/myC/FastqSplit/fqsplit -i {0}/fqsamplesheet.csv -1 Undetermined_S0_R1_001.fastq.gz -2 Undetermined_S0_R2_001.fastq.gz -o {1}".format(rawseq_path,rawfq_path))
-        logging.info("\nFastqSplit CMD: /haplox/users/longrw/myC/FastqSplit/fqsplit -i {0}/fqsamplesheet.csv -1 Undetermined_S0_R1_001.fastq.gz -2 Undetermined_S0_R2_001.fastq.gz -o {1}\n{2}".format(rawseq_path,rawfq_path,"#"*50))
+#    double_index = '{0}/fqsamplesheet.csv'.format(rawseq_path)
+#    if os.path.exists(double_index):
+#        os.system("/haplox/users/longrw/myC/FastqSplit/fqsplit -i {0}/fqsamplesheet.csv -1 Undetermined_S0_R1_001.fastq.gz -2 Undetermined_S0_R2_001.fastq.gz -o {1}".format(rawseq_path,rawfq_path))
+#        logging.info("\nFastqSplit CMD: /haplox/users/longrw/myC/FastqSplit/fqsplit -i {0}/fqsamplesheet.csv -1 Undetermined_S0_R1_001.fastq.gz -2 Undetermined_S0_R2_001.fastq.gz -o {1}\n{2}".format(rawseq_path,rawfq_path,"#"*50))
     # filter files and mkdir new folders
     flst = filter(lambda x: re.match(pattern, x), os.listdir("./"))
     logging.info("\nflst ={0}\n{1}".format(flst,"#"*50))

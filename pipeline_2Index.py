@@ -103,6 +103,8 @@ def main():
         os.system("bcl2fastq -r 72 -d 72 -p 72 -w 72 -o " + rawfq_path + " --tiles s_7 --barcode-mismatches=0")
         logging.info("\nBcl2fastq CMD: bcl2fastq -r 72 -d 72 -p 72 -w 72 -o {0} --tiles s_7 --barcode-mismatches=0\n{1}".format(rawfq_path,"#"*50))
     os.chdir(rawfq_path)
+    QC_dir = '{0}/QC'.format(rawfq_path)
+    if not os.path.exists(QC_dir):os.mkdir(QC_dir)
     double_index = '{0}/fqsamplesheet.csv'.format(rawseq_path)
     if os.path.exists(double_index):
         os.system("/haplox/users/longrw/myC/FastqSplit/fqsplit -i {0}/fqsamplesheet.csv -1 Undetermined_S0_R1_001.fastq.gz -2 Undetermined_S0_R2_001.fastq.gz -o {1}".format(rawseq_path,rawfq_path))
