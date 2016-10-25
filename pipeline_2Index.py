@@ -36,6 +36,7 @@ class Seq:
     def __init__(self, raw_name):
         self.rawfq_path = os.path.abspath("./")
         self.rawout_path = self.rawfq_path.replace("rawfq", "rawout")
+        self.cleanfq_path = self.rawfq_path.replace("rawfq","cleanfq")
         self.rawname = raw_name
         self.match = re.match(pattern, self.rawname).groups()
         self.sample_type = self.match[2]
@@ -91,10 +92,11 @@ def main():
     # deal with path
     rawseq_path = os.path.abspath("./")
     rawfq_path = rawseq_path.replace("rawseq", "rawfq")
+    cleanfq_path = rawseq_path.replace("rawseq", "cleanfq")
     rawout_path = rawseq_path.replace("rawseq", "rawout")
-    if not os.path.exists(rawout_path):
-        os.mkdir(rawout_path)
-    logging.info("\nRawseq path: {0}\nRawfq  path: {1}\nRawout path: {2}\n{3}".format(rawseq_path,rawfq_path,rawout_path,"#"*50))
+    if not os.path.exists(cleanfq_path):os.mkdir(cleanfq_path)
+    if not os.path.exists(rawout_path):os.mkdir(rawout_path)
+    logging.info("\nRawseq path: {0}\nRawfq  path: {1}\nRawout path: {2}\nClean path: {3}\n{4}".format(rawseq_path,rawfq_path,rawout_path,cleanfq_path,"#"*50))
     # bcl2fastq
     if 'NS500713' in rawseq_path:
         os.system("bcl2fastq -r 72 -d 72 -p 72 -w 72 -o " + rawfq_path + " --barcode-mismatches=0 --no-lane-splitting")
@@ -103,8 +105,8 @@ def main():
         os.system("bcl2fastq -r 72 -d 72 -p 72 -w 72 -o " + rawfq_path + " --tiles s_7 --barcode-mismatches=0")
         logging.info("\nBcl2fastq CMD: bcl2fastq -r 72 -d 72 -p 72 -w 72 -o {0} --tiles s_7 --barcode-mismatches=0\n{1}".format(rawfq_path,"#"*50))
     os.chdir(rawfq_path)
-    QC_dir = '{0}/QC'.format(rawfq_path)
-    if not os.path.exists(QC_dir):os.mkdir(QC_dir)
+    #QC_dir = '{0}/QC'.format(rawfq_path)
+    #if not os.path.exists(QC_dir):os.mkdir(QC_dir)
     double_index = '{0}/fqsamplesheet.csv'.format(rawseq_path)
     if os.path.exists(double_index):
         os.system("/haplox/users/longrw/myC/FastqSplit/fqsplit -i {0}/fqsamplesheet.csv -1 Undetermined_S0_R1_001.fastq.gz -2 Undetermined_S0_R2_001.fastq.gz -o {1}".format(rawseq_path,rawfq_path))
@@ -119,10 +121,10 @@ def main():
     p.join()
     # after again
     os.chdir(rawfq_path)
-    good_dir = '{0}/good'.format(rawfq_path)
+    good_dir = '{0}/good'.format(cleanfq_path)
     if not os.path.exists(good_dir):os.mkdir(good_dir)
     r1_lst = filter(lambda x: re.match(r'(^S\d+)(.+)(_R1)(_001.fastq|_001.fastq.gz)', x), os.listdir("./"))
-    r1_good_lst = filter(lambda x: re.match(r'(^S\d+)(.+)(_R1)(_001.good.fq|_001.good.fq.gz)', x), os.listdir("./good"))
+    r1_good_lst = filter(lambda x: re.match(r'(^S\d+)(.+)(_R1)(_001.good.fq|_001.good.fq.gz)', x), os.listdir("%s/good" % cleanfq_path))
     r1_good_lst_ID = [f.split('.')[0] for f in r1_good_lst]
     rs = []
     for r1 in r1_lst:

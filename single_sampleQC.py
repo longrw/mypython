@@ -17,6 +17,7 @@ def parse_cmd():
     parser.add_option('-1', '--rawfq_path', dest = 'rawfq_path', default = None, help = 'the rawfq path')
     parser.add_option('-2', '--estimated_yield', dest = 'estimated_yield', default = None, help = 'the estimated yield data')
     parser.add_option('-3', '--png_ID', dest = 'png_ID', default = None, help = 'ID for png of estimated_VS_real_yield')
+    parser.add_option('-o', '--output', dest = 'output', default = None, help = 'output dir')
     return parser.parse_args()
 
 def single_sampleQC(f):
@@ -55,7 +56,8 @@ def main():
     (options, args) = parse_cmd()
     #dir
     global outpath
-    outpath = '{0}/single_sampleQC'.format(options.rawfq_path)
+    outpath = '{0}/single_sampleQC'.format(options.output)
+    if options.output == None:outpath = '{0}/single_sampleQC'.format(options.rawfq_path)
     if not os.path.exists(outpath):
         os.mkdir(outpath)
     os.chdir(options.rawfq_path)
