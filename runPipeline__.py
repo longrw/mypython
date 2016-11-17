@@ -56,9 +56,9 @@ def fqsplit(index, inpath, outpath):
             logging.info("\nFastqSplit CMD: /haplox/users/longrw/myC/FastqSplit/fqsplit -i %s -1 %s -2 %s -o %s\n%s" % (index, r1, r2, rawfq, "#"*50))
 
 
-def flsts(pattern, directory):
-    flsts = filter(lambda x: re.match(pattern, x), os.listdir(directory))
-    return flsts
+def flsts_filter(pattern, directory):
+    fls = filter(lambda x: re.match(pattern, x), os.listdir(directory))
+    return fls
 
 
 def after(Rs):
@@ -217,7 +217,7 @@ def main():
     fqsplit(index, rawfq, rawfq)
     # filter files and mkdir new folders
     os.chdir(rawfq)
-    flsts = flsts(pattern, rawfq)
+    flsts = flsts_filter(pattern, rawfq)
     logging.info("\nflsts =%s\n%s" % (flsts, "#"*50))
     # parallel
     args_analysis = []
