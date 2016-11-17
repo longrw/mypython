@@ -35,7 +35,7 @@ def bcl2fastq(rawseq, files, rawfq, lane_s, lane_e):
     samplesheet = os.path.join(files, "SampleSheet.csv")
     if 'NS500713' in rawseq:
         os.system("bcl2fastq_v2_18 -r 72 -d 72 -p 72 -w 72 -R %s --sample-sheet %s -o %s --barcode-mismatches=0 --no-lane-splitting" % (rawseq, samplesheet, rawfq))
-        logging.info("\nBcl2fastq_v2_18 CMD: bcl2fastq -r 72 -d 72 -p 72 -w 72 -R %s --sample-sheet %s -o %s --barcode-mismatches=0 --no-lane-splitting\n%s" % (rawseq, samplesheet, rawfq, "#"*50))
+        logging.info("\nBcl2fastq CMD: bcl2fastq_v2_18 -r 72 -d 72 -p 72 -w 72 -R %s --sample-sheet %s -o %s --barcode-mismatches=0 --no-lane-splitting\n%s" % (rawseq, samplesheet, rawfq, "#"*50))
     if 'ST-E' in rawseq:
         if lane_s and lane_e:
             tiles = "s_[{0}-{1}]".format(lane_s, lane_e)
@@ -188,6 +188,8 @@ def main():
     rawfq = options.rawfq_path
     if rawfq == None:
         rawfq = rawseq.replace("rawseq", "rawfq")
+    if not os.path.exists(rawfq):
+        os.makedirs(rawfq)
     rawout = options.rawout_path
     if rawout == None:
         rawout = rawseq.replace("rawseq", "rawout")
