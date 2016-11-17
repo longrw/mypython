@@ -31,8 +31,8 @@ def multi_process(func, args, np=""):
     p.join()
 
 
-def bcl2fastq(*argv, **kw):
-    #samplesheet = os.path.join(files, "SampleSheet.csv")
+def bcl2fastq(rawseq, files, rawfq, lane_s, lane_e):
+    samplesheet = os.path.join(files, "SampleSheet.csv")
     if 'NS500713' in rawseq:
         os.system("bcl2fastq_v2_18 -r 72 -d 72 -p 72 -w 72 -R %s --sample-sheet %s -o %s --barcode-mismatches=0 --no-lane-splitting" % (rawseq, samplesheet, rawfq))
         logging.info("\nBcl2fastq_v2_18 CMD: bcl2fastq -r 72 -d 72 -p 72 -w 72 -R %s --sample-sheet %s -o %s --barcode-mismatches=0 --no-lane-splitting\n%s" % (rawseq, samplesheet, rawfq, "#"*50))
@@ -210,8 +210,7 @@ def main():
     # bcl2fastq
     lane_s = options.lane_start
     lane_e = options.lane_end
-    samplesheet = os.path.join(files, "SampleSheet.csv")
-    bcl2fastq(rawseq, samplesheet, rawfq, lane_s, lane_e)
+    bcl2fastq(rawseq, files, rawfq, lane_s, lane_e)
     index = os.path.join(files, "fqsamplesheet.csv")
     fqsplit(index, rawfq, rawfq)
     # filter files and mkdir new folders
