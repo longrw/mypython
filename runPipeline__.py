@@ -45,16 +45,15 @@ def bcl2fastq(*argv, **kw):
         logging.info("\nBcl2fastq CMD: bcl2fastq_v2_18 -r 72 -d 72 -p 72 -w 72 -R %s --sample-sheet %s -o %s --tiles %s --barcode-mismatches=0\n%s" % (rawseq, samplesheet, rawfq, tiles, "#"*50))
 
 
-def fqsplit():
-    index = '{0}/fqsamplesheet.csv'.format(files)
-    num_S = filter(lambda x: re.match(r'(^S\d+)(.+)(_001.fastq|_001.fastq.gz)', x), os.listdir(rawfq))
+def fqsplit(index, inpath, outpath):
+    num_S = filter(lambda x: re.match(r'(^S\d+)(.+)(_001.fastq|_001.fastq.gz)', x), os.listdir(inpath))
     if not num_S:
         undetermined_pattern = re.compile(r'Undetermined(.+)(_R1_001.fastq.gz|_R1_001.fastq)')
-        undetermined_files = filter(lambda x: re.match(undetermined_pattern, x), os.listdir(rawfq))
+        undetermined_files = filter(lambda x: re.match(undetermined_pattern, x), os.listdir(inpath))
         for r1 in undetermined_files:
             r2 = r1.replace("R1", "R2")
-            os.system("/haplox/users/longrw/myC/FastqSplit/fqsplit -i %s -1 %s -2 %s -o %s" % (index, r1, r2, rawfq))
-        logging.info("\nFastqSplit CMD: /haplox/users/longrw/myC/FastqSplit/fqsplit -i %s -1 %s -2 %s -o %s\n%s" % (index, r1, r2, rawfq, "#"*50))
+            os.system("/haplox/users/longrw/myC/FastqSplit/fqsplit -i %s -1 %s -2 %s -o %s" % (index, r1, r2, outpath))
+            logging.info("\nFastqSplit CMD: /haplox/users/longrw/myC/FastqSplit/fqsplit -i %s -1 %s -2 %s -o %s\n%s" % (index, r1, r2, rawfq, "#"*50))
 
 
 def flsts(pattern, directory):
@@ -68,7 +67,7 @@ def after(Rs):
             % (Rs[0], Rs[1], Rs[2], "#"*50))
 
 
-class Seq(object):
+class Snv(object):
     def __init__(self, rawfq, raw_name):
         self.rawfq_path = rawfq
         self.rawout_path = self.rawfq_path.replace('rawfq','rawout')
@@ -82,44 +81,48 @@ class Seq(object):
         self.panel_type_all = self.panel_type.replace('-', '_')
 
     def cfdna2gdna_after(self):
-            cfdnaR1 = self.rawname
-            cfdnaR2 = self.rawname.replace('R1','R2')
-            pattern_r1 = re.compile(
-                    r'(^S\d+)[-_]'+self.match[1]+'[-_]gdna[-_]'+self.panel_type+
-                    '(.+)(R1_001.fastq.gz|R1_001.fastq)$')
-            gdnaR1 = ''.join(filter(lambda x: re.match(pattern_r1, x), os.listdir(rawfq)))
-            pattern_r2 = re.compile(
-                    r'(^S\d+)[-_]'+self.match[1]+'[-_]gdna[-_]'+self.panel_type+
-                    '(.+)(R2_001.fastq.gz|R2_001.fastq)$')
-            gdnaR2 = ''.join(filter(lambda x: re.match(pattern_r2, x), os.listdir(rawfq)))
-            if (os.path.exists(cfdnaR1) and os.path.exists(cfdnaR2) 
-                    and os.path.exists(gdnaR1) and os.path.exists(gdnaR2)):
-                Rs = [(cfdnaR1, cfdnaR2, self.good_path), (gdnaR1, gdnaR2, self.good_path)]
-                multi_process(after, Rs)
+        cfdnaR1 = self.rawname
+        cfdnaR2 = self.rawname.replace('R1','R2')
+        pattern_r1 = re.compile(
+                r'(^S\d+)[-_]'+self.match[1]+'[-_]gdna[-_]'+self.panel_type+
+                '(.+)(R1_001.fastq.gz|R1_001.fastq)$')
+        gdnaR1 = ''.join(filter(lambda x: re.match(pattern_r1, x), os.listdir(self.rawfq_path)))
+        pattern_r2 = re.compile(
+                r'(^S\d+)[-_]'+self.match[1]+'[-_]gdna[-_]'+self.panel_type+
+                '(.+)(R2_001.fastq.gz|R2_001.fastq)$')
+        gdnaR2 = ''.join(filter(lambda x: re.match(pattern_r2, x), os.listdir(self.rawfq_path)))
+        if (os.path.exists(cfdnaR1) and os.path.exists(cfdnaR2) 
+                and os.path.exists(gdnaR1) and os.path.exists(gdnaR2)):
+            Rs = [(cfdnaR1, cfdnaR2, self.good_path), (gdnaR1, gdnaR2, self.good_path)]
+            multi_process(after, Rs)
+        return cfdnaR1,cfdnaR2,gdnaR1,gdnaR2
 
     def cfdna2gdna_analysis(self):
-            cfdnaR1_good = self.good_path + "/" + cfdnaR1.split('.')[0] + '.good.fq'
-            cfdnaR2_good = self.good_path + "/" + cfdnaR2.split('.')[0] + '.good.fq'
-            gdnaR1_good = self.good_path + "/" + gdnaR1.split('.')[0] + '.good.fq'
-            gdnaR2_good = self.good_path + "/" + gdnaR2.split('.')[0] + '.good.fq'
-            cfdna_prefix = self.match[0] + "_cfdna"
-            gdna_prefix = cfdna_prefix.replace('cfdna', 'gdna')
-            if (os.path.exists(cfdnaR1_good) and os.path.exists(cfdnaR2_good) 
-                    and os.path.exists(gdnaR1_good) and os.path.exists(gdnaR2_good)):
-                if not os.path.exists(self.output_path):
-                    os.mkdir(self.output_path)
-                os.system( "python /haplox/users/huang/mypy/data-analysis/ctdna_exome_pipeline/ctdna_normal_chemo.py -1 %s -2 %s -m %s -3 %s -4 %s -n %s -c %s -b /haplox/users/longrw/ref_data/bed/%s.bed -e /haplox/users/longrw/ref_data/bed/exon/%s.bed -o %s > %s/%s.out 2>&1" % (gdnaR1_good, gdnaR2_good, gdna_prefix, cfdnaR1_good, cfdnaR2_good, cfdna_prefix, self.panel_type_all, self.panel_type_all, self.panel_type_all, self.output_path, self.output_path, cfdna_prefix))
-                logging.info("\npython /haplox/users/huang/mypy/data-analysis/ctdna_exome_pipeline/ctdna_normal_chemo.py -1 %s -2 %s -m %s -3 %s -4 %s -n %s -c %s -b /haplox/users/longrw/ref_data/bed/%s.bed -e /haplox/users/longrw/ref_data/bed/exon/%s.bed -o %s > %s/%s.out 2>&1\n%s" % (gdnaR1_good, gdnaR2_good, gdna_prefix, cfdnaR1_good, cfdnaR2_good, cfdna_prefix, self.panel_type_all, self.panel_type_all, self.panel_type_all, self.output_path, self.output_path, cfdna_prefix, "#"*50))
+        dna = self.cfdna2gdna_after()
+        cfdnaR1_good = self.good_path + "/" + dna[0].split('.')[0] + '.good.fq'
+        cfdnaR2_good = self.good_path + "/" + dna[1].split('.')[0] + '.good.fq'
+        gdnaR1_good = self.good_path + "/" + dna[2].split('.')[0] + '.good.fq'
+        gdnaR2_good = self.good_path + "/" + dna[3].split('.')[0] + '.good.fq'
+        cfdna_prefix = self.match[0] + "_cfdna"
+        gdna_prefix = cfdna_prefix.replace('cfdna', 'gdna')
+        if (os.path.exists(cfdnaR1_good) and os.path.exists(cfdnaR2_good) 
+                and os.path.exists(gdnaR1_good) and os.path.exists(gdnaR2_good)):
+            if not os.path.exists(self.output_path):
+                os.mkdir(self.output_path)
+            os.system( "python /haplox/users/huang/mypy/data-analysis/ctdna_exome_pipeline/ctdna_normal_chemo.py -1 %s -2 %s -m %s -3 %s -4 %s -n %s -c %s -b /haplox/users/longrw/ref_data/bed/%s.bed -e /haplox/users/longrw/ref_data/bed/exon/%s.bed -o %s > %s/%s.out 2>&1" % (gdnaR1_good, gdnaR2_good, gdna_prefix, cfdnaR1_good, cfdnaR2_good, cfdna_prefix, self.panel_type_all, self.panel_type_all, self.panel_type_all, self.output_path, self.output_path, cfdna_prefix))
+            logging.info("\npython /haplox/users/huang/mypy/data-analysis/ctdna_exome_pipeline/ctdna_normal_chemo.py -1 %s -2 %s -m %s -3 %s -4 %s -n %s -c %s -b /haplox/users/longrw/ref_data/bed/%s.bed -e /haplox/users/longrw/ref_data/bed/exon/%s.bed -o %s > %s/%s.out 2>&1\n%s" % (gdnaR1_good, gdnaR2_good, gdna_prefix, cfdnaR1_good, cfdnaR2_good, cfdna_prefix, self.panel_type_all, self.panel_type_all, self.panel_type_all, self.output_path, self.output_path, cfdna_prefix, "#"*50))
 
     def ffpe_after(self):
         dnaR1 = self.rawname
         dnaR2 = self.rawname.replace('R1','R2')
         if os.path.exists(dnaR1) and os.path.exists(dnaR2):
             after((dnaR1, dnaR2, self.good_path))
+        return dnaR1,dnaR2
 
     def ffpe_analysis(self):
-        dnaR1_good = self.good_path + "/" + dnaR1.split('.')[0] + '.good.fq'
-        dnaR2_good = self.good_path + "/" + dnaR2.split('.')[0] + '.good.fq'
+        dna = ffpe_after()
+        dnaR1_good = self.good_path + "/" + dna[0].split('.')[0] + '.good.fq'
+        dnaR2_good = self.good_path + "/" + dna[1].split('.')[0] + '.good.fq'
         dna_prefix = self.match[0]
         if os.path.exists(dnaR1_good) and os.path.exists(dnaR2_good):
             if not os.path.exists(self.output_path):
@@ -128,8 +131,9 @@ class Seq(object):
             logging.info("\npython /haplox/users/huang/mypy/data-analysis/ctdna_exome_pipeline/single_mutant_pe.py -1 %s -2 %s -n %s -c %s -b /haplox/users/longrw/ref_data/bed/%s.bed -e /haplox/users/longrw/ref_data/bed/exon/%s.bed -o %s > %s/%s.out 2>&1\n%s" % (dnaR1_good, dnaR2_good, dna_prefix, self.panel_type_all, self.panel_type_all, self.panel_type_all, self.output_path, self.output_path, dna_prefix, "#"*50))
 
     def health_analysis(self):
-        gdnahealthR1_good = self.good_path + "/" + gdnahealthR1.split('.')[0] + '.good.fq'
-        gdnahealthR2_good = self.good_path + "/" + gdnahealthR2.split('.')[0] + '.good.fq'
+        dna = ffpe_after()
+        gdnahealthR1_good = self.good_path + "/" + dna[0].split('.')[0] + '.good.fq'
+        gdnahealthR2_good = self.good_path + "/" + dna[1].split('.')[0] + '.good.fq'
         gdnahealth_prefix = self.match[0]
         if os.path.exists(gdnahealthR1_good) and os.path.exists(gdnahealthR2_good):
             if not os.path.exists(self.output_path):
@@ -142,8 +146,13 @@ class Seq(object):
 
 
 def all_analysis((rawfq, f)):
-    sample = Seq(rawfq, f)
-    sample.capture_analysis()
+    sample = Snv(rawfq, f)
+    if sample.sample_type == "cfdna":
+        sample.cfdna2gdna_analysis()
+    if sample.sample_type in ["ffpedna", "pedna", "fnadna", "saldna", "ttdna", "urinedna"]:
+        sample.ffpe_analysis()
+    if sample.sample_type == "gdnahealth":
+        sample.health_analysis()
 
 
 def after_again(rawfq, cleanfq):
@@ -160,10 +169,7 @@ def after_again(rawfq, cleanfq):
         if r1.split('.')[0] not in r1_good_lst_ID:
             r2 = r1.replace('R1','R2')
             rs.append((r1, r2, good_dir))
-    a = Pool()
-    a.map(after, rs)
-    a.close()
-    a.join()
+    multi_process(after, rs)
 
 
 def single_sampleQC(files, rawfq):
@@ -205,6 +211,8 @@ def main():
     lane_s = options.lane_start
     lane_e = options.lane_end
     bcl2fastq(rawseq, files, rawfq, lane_s, lane_e)
+    index = '{0}/fqsamplesheet.csv'.format(files)
+    fqsplit(index, rawfq, rawfq)
     # filter files and mkdir new folders
     os.chdir(rawfq)
     flsts = flsts(pattern, rawfq)
