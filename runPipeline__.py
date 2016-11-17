@@ -24,8 +24,8 @@ def parse_cmd():
     return parser.parse_args()
 
 
-def multi_process(func, args, np=""):
-    p = Pool(np)
+def multi_process(func, args):
+    p = Pool()
     p.map(func, args)
     p.close()
     p.join()
@@ -223,7 +223,7 @@ def main():
     args_analysis = []
     for flst in flsts:
         args_analysis.append((rawfq, flst))
-    multi_process(all_analysis, args_analysis, 6)
+    multi_process(all_analysis, args_analysis)
     # single sampleQC
     single_sampleQC(files, rawfq)
     # after again
