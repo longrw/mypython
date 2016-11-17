@@ -32,7 +32,7 @@ def multi_process(func, args, np=""):
 
 
 def bcl2fastq(*argv, **kw):
-    samplesheet = '{0}/SampleSheet.csv'.format(files)
+    samplesheet = os.path.join(files, "SampleSheet.csv")
     if 'NS500713' in rawseq:
         os.system("bcl2fastq_v2_18 -r 72 -d 72 -p 72 -w 72 -R %s --sample-sheet %s -o %s --barcode-mismatches=0 --no-lane-splitting" % (rawseq, samplesheet, rawfq))
         logging.info("\nBcl2fastq_v2_18 CMD: bcl2fastq -r 72 -d 72 -p 72 -w 72 -R %s --sample-sheet %s -o %s --barcode-mismatches=0 --no-lane-splitting\n%s" % (rawseq, samplesheet, rawfq, "#"*50))
@@ -108,7 +108,7 @@ class Snv(object):
         if (os.path.exists(cfdnaR1_good) and os.path.exists(cfdnaR2_good) 
                 and os.path.exists(gdnaR1_good) and os.path.exists(gdnaR2_good)):
             if not os.path.exists(self.output_path):
-                os.mkdir(self.output_path)
+                os.makedirs(self.output_path)
             os.system( "python /haplox/users/huang/mypy/data-analysis/ctdna_exome_pipeline/ctdna_normal_chemo.py -1 %s -2 %s -m %s -3 %s -4 %s -n %s -c %s -b /haplox/users/longrw/ref_data/bed/%s.bed -e /haplox/users/longrw/ref_data/bed/exon/%s.bed -o %s > %s/%s.out 2>&1" % (gdnaR1_good, gdnaR2_good, gdna_prefix, cfdnaR1_good, cfdnaR2_good, cfdna_prefix, self.panel_type_all, self.panel_type_all, self.panel_type_all, self.output_path, self.output_path, cfdna_prefix))
             logging.info("\npython /haplox/users/huang/mypy/data-analysis/ctdna_exome_pipeline/ctdna_normal_chemo.py -1 %s -2 %s -m %s -3 %s -4 %s -n %s -c %s -b /haplox/users/longrw/ref_data/bed/%s.bed -e /haplox/users/longrw/ref_data/bed/exon/%s.bed -o %s > %s/%s.out 2>&1\n%s" % (gdnaR1_good, gdnaR2_good, gdna_prefix, cfdnaR1_good, cfdnaR2_good, cfdna_prefix, self.panel_type_all, self.panel_type_all, self.panel_type_all, self.output_path, self.output_path, cfdna_prefix, "#"*50))
 
@@ -126,7 +126,7 @@ class Snv(object):
         dna_prefix = self.match[0]
         if os.path.exists(dnaR1_good) and os.path.exists(dnaR2_good):
             if not os.path.exists(self.output_path):
-                os.mkdir(self.output_path)
+                os.makedirs(self.output_path)
             os.system("python /haplox/users/huang/mypy/data-analysis/ctdna_exome_pipeline/single_mutant_pe.py -1 %s -2 %s -n %s -c %s -b /haplox/users/longrw/ref_data/bed/%s.bed -e /haplox/users/longrw/ref_data/bed/exon/%s.bed -o %s > %s/%s.out 2>&1" % (dnaR1_good, dnaR2_good, dna_prefix, self.panel_type_all, self.panel_type_all, self.panel_type_all, self.output_path, self.output_path, dna_prefix))
             logging.info("\npython /haplox/users/huang/mypy/data-analysis/ctdna_exome_pipeline/single_mutant_pe.py -1 %s -2 %s -n %s -c %s -b /haplox/users/longrw/ref_data/bed/%s.bed -e /haplox/users/longrw/ref_data/bed/exon/%s.bed -o %s > %s/%s.out 2>&1\n%s" % (dnaR1_good, dnaR2_good, dna_prefix, self.panel_type_all, self.panel_type_all, self.panel_type_all, self.output_path, self.output_path, dna_prefix, "#"*50))
 
@@ -137,10 +137,10 @@ class Snv(object):
         gdnahealth_prefix = self.match[0]
         if os.path.exists(gdnahealthR1_good) and os.path.exists(gdnahealthR2_good):
             if not os.path.exists(self.output_path):
-                os.mkdir(self.output_path)
-            germline_output = self.output_path + "/germline"
+                os.makedirs(self.output_path)
+            germline_output = os.path.join(self.output_path, "germline")
             if not os.path.exists(germline_output):
-                os.mkdir(germline_output)
+                os.makedirs(germline_output)
             os.system("perl /haplox/users/huang/mypy/data-analysis/ctdna_exome_pipeline/Target_pipeline.pl -t 10 -fq1 %s -fq2 %s -outdir %s -keyname %s -L /haplox/users/longrw/ref_data/bed/%s.bed" % (gdnahealthR1_good, gdnahealthR2_good, germline_output, gdnahealth_prefix, self.panel_type_all))
             logging.info("\nperl /haplox/users/huang/mypy/data-analysis/ctdna_exome_pipeline/Target_pipeline.pl -t 10 -fq1 %s -fq2 %s -outdir %s -keyname %s -L /haplox/users/longrw/ref_data/bed/%s.bed\n%s" % (gdnahealthR1_good, gdnahealthR2_good, germline_output, gdnahealth_prefix, self.panel_type_all, "#"*50))
 
@@ -156,9 +156,9 @@ def all_analysis((rawfq, f)):
 
 
 def after_again(rawfq, cleanfq):
-    good_dir = '{0}/good'.format(cleanfq)
+    good_dir = os.path.join(cleanfq, "good")
     if not os.path.exists(good_dir):
-        os.mkdir(good_dir)
+        os.makedirs(good_dir)
     pattern_r1_lst = re.compile(r'(^S\d+)(.+)(_R1)(_001.fastq|_001.fastq.gz)')
     r1_lst = filter(lambda x: re.match(pattern_r1_lst, x), os.listdir(rawfq))
     pattern_r1_good_lst = re.compile(r'(^S\d+)(.+)(_R1)(_001.good.fq|_001.good.fq.gz)')
@@ -173,7 +173,7 @@ def after_again(rawfq, cleanfq):
 
 
 def single_sampleQC(files, rawfq):
-    estimated_yield = '{0}/estimated_yield.csv'.format(files)
+    estimated_yield = os.path.join(files, "estimated_yield.csv")
     yield_ID = os.path.basename(rawfq)
     os.system("python /haplox/users/longrw/mypython/single_sampleQC.py -1 %s -2 %s -3 %s -o %s" % (rawfq, estimated_yield, yield_ID, files))
     logging.info("\nsingle_sampleQC CMD:python /haplox/users/longrw/mypython/single_sampleQC.py -1 %s -2 %s -3 %s -o %s\n%s" % (rawfq, estimated_yield, yield_ID, files, "#"*50))
@@ -192,16 +192,16 @@ def main():
     if rawout == None:
         rawout = rawseq.replace("rawseq", "rawout")
     if not os.path.exists(rawout):
-        os.mkdir(rawout)
+        os.makedirs(rawout)
     cleanfq = options.cleanfq_path
     if cleanfq == None:
         cleanfq = rawseq.replace("rawseq", "cleanfq")
     if not os.path.exists(cleanfq):
-        os.mkdir(cleanfq)
+        os.makedirs(cleanfq)
     files = options.file_path
     if files == None:
         files = rawseq
-    log = "{0}/pipeline_RunInfo.log".format(files)
+    log = os.path.join(files, "pipeline_RunInfo.log")
     logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s', 
             datefmt='%a, %d %b %Y %H:%M:%S', filename=log, filemode='a')
     logging.info(
@@ -211,7 +211,7 @@ def main():
     lane_s = options.lane_start
     lane_e = options.lane_end
     bcl2fastq(rawseq, files, rawfq, lane_s, lane_e)
-    index = '{0}/fqsamplesheet.csv'.format(files)
+    index = os.path.join(files, "fqsamplesheet.csv")
     fqsplit(index, rawfq, rawfq)
     # filter files and mkdir new folders
     os.chdir(rawfq)
