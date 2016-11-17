@@ -49,7 +49,7 @@ def Undetermined_2Index(inpath):
     for f in fs:
         fp = '{0}/{1}'.format(inpath, f)
         if os.path.exists(fp):
-            os.system("python /haplox/users/longrw/mypython/Undetermined_2Index_top20.py {0}".format(fp))
+            os.system("python /haplox/users/longrw/mypython/Undetermined_2Index_top20.py {0} {1}".format(fp,outpath))
 
 def main():
     time1 = time.time()
@@ -60,9 +60,10 @@ def main():
     if options.output == None:outpath = '{0}/single_sampleQC'.format(options.rawfq_path)
     if not os.path.exists(outpath):
         os.mkdir(outpath)
-    os.chdir(options.rawfq_path)
     #CfdnaPattern
+    os.chdir(options.output)
     CfdnaPattern(options.rawfq_path)
+    os.chdir(options.rawfq_path)
     #qc.txt
     flst = sorted(filter(lambda x: re.match(pattern, x), os.listdir('./')))
     p = Pool(30)
@@ -98,6 +99,7 @@ def main():
     estimated_vs_real_yield(qc_csv, outpath, options.png_ID)
     q30_GC(qc_csv, options.png_ID)
     #Undetermined_2Index
+    os.chdir(options.output)
     Undetermined_2Index(options.rawfq_path)
     #time used
     time2 = time.time()
