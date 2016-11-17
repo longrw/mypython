@@ -39,14 +39,14 @@ def CfdnaPattern(inpath):
     fqgz = filter(lambda x: re.match(r'(^S\d+)(.+)(_001.fastq.gz)$', x), os.listdir(inpath))
     fq = filter(lambda x: re.match(r'(^S\d+)(.+)(_001.fastq)$', x), os.listdir(inpath))
     if fqgz:
-        fs = '.fastq.gz'
+        fqs = '.fastq.gz'
     elif fq:
-        fs = '.fastq'
-    os.system("python /tools/CfdnaPattern/predict.py -q {0}/S*{1} > {2}".format(inpath, fs, CfdnaPattern))
+        fqs = '.fastq'
+    os.system("python /tools/CfdnaPattern/predict.py -q {0}/S*{1} > {2}".format(inpath, fqs, CfdnaPattern))
 
 def Undetermined_2Index(inpath):
-    fs = filter(lambda x: re.match(r'Undetermined(.+)R1(.+)', x), os.listdir(inpath))
-    for f in fs:
+    ufs = filter(lambda x: re.match(r'Undetermined(.+)R1(.+)', x), os.listdir(inpath))
+    for f in ufs:
         fp = '{0}/{1}'.format(inpath, f)
         if os.path.exists(fp):
             os.system("python /haplox/users/longrw/mypython/Undetermined_2Index_top20.py {0} {1}".format(fp,outpath))

@@ -120,7 +120,7 @@ class Snv(object):
         return dnaR1,dnaR2
 
     def ffpe_analysis(self):
-        dna = ffpe_after()
+        dna = self.ffpe_after()
         dnaR1_good = self.good_path + "/" + dna[0].split('.')[0] + '.good.fq'
         dnaR2_good = self.good_path + "/" + dna[1].split('.')[0] + '.good.fq'
         dna_prefix = self.match[0]
@@ -131,7 +131,7 @@ class Snv(object):
             logging.info("\npython /haplox/users/huang/mypy/data-analysis/ctdna_exome_pipeline/single_mutant_pe.py -1 %s -2 %s -n %s -c %s -b /haplox/users/longrw/ref_data/bed/%s.bed -e /haplox/users/longrw/ref_data/bed/exon/%s.bed -o %s > %s/%s.out 2>&1\n%s" % (dnaR1_good, dnaR2_good, dna_prefix, self.panel_type_all, self.panel_type_all, self.panel_type_all, self.output_path, self.output_path, dna_prefix, "#"*50))
 
     def health_analysis(self):
-        dna = ffpe_after()
+        dna = self.ffpe_after()
         gdnahealthR1_good = self.good_path + "/" + dna[0].split('.')[0] + '.good.fq'
         gdnahealthR2_good = self.good_path + "/" + dna[1].split('.')[0] + '.good.fq'
         gdnahealth_prefix = self.match[0]
