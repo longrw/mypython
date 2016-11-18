@@ -6,6 +6,7 @@ import re
 from multiprocessing import Pool
 import logging
 from optparse import OptionParser
+import time
 
 pattern = re.compile(r'(^S\d+)[-_](.+)[-_](cfdna|ffpedna|pedna|fnadna|saldna|ttdna|gdnahealth|cfdnahealth|urinedna)[-_](lung[-_]roche|gene77|roche929|rectum[-_]roche|stomach[-_]roche|breast[-_]roche|liver[-_]roche|pan[-_]cancer[-_]v1|genome|exons[-_]roche)(.+)(R1_001.good.fq|R1_001.fastq.gz|R1_001.fastq)$')
 
@@ -68,6 +69,7 @@ def after(Rs):
 
 
 class Snv(object):
+
     def __init__(self, rawfq, raw_name):
         self.rawfq_path = rawfq
         self.rawout_path = self.rawfq_path.replace('rawfq','rawout')
@@ -180,7 +182,15 @@ def single_sampleQC(files, rawfq):
 
 
 def main():
+    time1 = time.time()
+
     (options, args) = parse_cmd()
+
+    # log
+    log = os.path.join(files, "pipeline_RunInfo.log")
+    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s', 
+        datefmt='%a, %d %b %Y %H:%M:%S', filename=log, filemode='a')
+
     # deal with dir
     rawseq = options.rawseq_path
     if rawseq == None:
@@ -203,32 +213,38 @@ def main():
     files = options.file_path
     if files == None:
         files = rawseq
-    log = os.path.join(files, "pipeline_RunInfo.log")
-    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s', 
-            datefmt='%a, %d %b %Y %H:%M:%S', filename=log, filemode='a')
     logging.info(
             "\nRawseq path: %s\nRawfq  path: %s\nCleanfq path: %s\nRawout path: %s\nRuninfo path: %s\n%s" % 
             (rawseq, rawfq, cleanfq, rawout, files, "#"*50))
+    
     # bcl2fastq
     lane_s = options.lane_start
     lane_e = options.lane_end
     bcl2fastq(rawseq, files, rawfq, lane_s, lane_e)
     index = os.path.join(files, "fqsamplesheet.csv")
     fqsplit(index, rawfq, rawfq)
+    
     # filter files and mkdir new folders
     os.chdir(rawfq)
     flsts = flsts_filter(pattern, rawfq)
     logging.info("\nflsts =%s\n%s" % (flsts, "#"*50))
-    # parallel
+    
+    # parallel analysis
     args_analysis = []
     for flst in flsts:
         args_analysis.append((rawfq, flst))
     multi_process(all_analysis, args_analysis)
+    
     # single sampleQC
     single_sampleQC(files, rawfq)
+    
     # after again
     after_again(rawfq, cleanfq)
+
+    #congratulations
     logging.info("\n{0}".format('The great pipeline has been successful!!!\n'*3))
+    time2 = time.time()
+    print "Time used: {0}".format(str(time2-time1))
 
 
 if __name__ == "__main__":
