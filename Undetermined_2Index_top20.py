@@ -8,12 +8,12 @@ def searchIndex(f,output):
         if 'L00' in f:
             os.system("gunzip -c %s | sed -n '/@ST-E/p' | awk -F \":\" '{print $10}' | awk -F \"+\" '{print $1}' > %s/Undetermined_Index" % (f,output))
         else:
-            os.system("gunzip -c %s | sed -n '/@NS500713/p' | awk -F \":\" '{print $10}' | awk -F \"+\" '{print $1}' > %s/Undetermined_Index" % (f,output))
+            os.system("gunzip -c %s | sed -n '/@NB551106/p' | awk -F \":\" '{print $10}' | awk -F \"+\" '{print $1}' > %s/Undetermined_Index" % (f,output))
     elif '.fastq' in f:
         if 'L00' in f:
             os.system("sed -n '/@ST-E/p' %s | awk -F \":\" '{print $10}' | awk -F \"+\" '{print $1}' > %s/Undetermined_Index" % (f,output))
         else:
-            os.system("sed -n '/@NS500713/p' %s | awk -F \":\" '{print $10}' | awk -F \"+\" '{print $1}' > %s/Undetermined_Index" % (f,output))
+            os.system("sed -n '/@NB551106/p' %s | awk -F \":\" '{print $10}' | awk -F \"+\" '{print $1}' > %s/Undetermined_Index" % (f,output))
     os.chdir(output)
     os.system("sort -o Undetermined_Index_sort Undetermined_Index")
     os.system("uniq -c Undetermined_Index_sort > Undetermined_Index_sort_uniq")

@@ -8,7 +8,7 @@ import logging
 from optparse import OptionParser
 import time
 
-pattern = re.compile(r'(^S\d+)[-_](.+)[-_](cfdna|ffpedna|pedna|fnadna|saldna|ttdna|gdnahealth|cfdnahealth|urinedna)[-_](lung[-_]roche|gene77|roche929|rectum[-_]roche|stomach[-_]roche|breast[-_]roche|liver[-_]roche|pan[-_]cancer[-_]v1|genome|exons[-_]roche)(.+)(R1_001.good.fq|R1_001.fastq.gz|R1_001.fastq)$')
+pattern = re.compile(r'(^S\d+)[-_](.+)[-_](cfdna|ffpedna|pedna|fnadna|saldna|ttdna|healthgdna|healthcfdna|urinedna)[-_](lung[-_]roche|gene77|roche929|rectum[-_]roche|stomach[-_]roche|breast[-_]roche|liver[-_]roche|pan[-_]cancer[-_]v1|genome|exons[-_]roche)(.+)(R1_001.good.fq|R1_001.fastq.gz|R1_001.fastq)$')
 
 
 def parse_cmd():
@@ -186,11 +186,6 @@ def main():
 
     (options, args) = parse_cmd()
 
-    # log
-    log = os.path.join(files, "pipeline_RunInfo.log")
-    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s', 
-        datefmt='%a, %d %b %Y %H:%M:%S', filename=log, filemode='a')
-
     # deal with dir
     rawseq = options.rawseq_path
     if rawseq == None:
@@ -213,9 +208,11 @@ def main():
     files = options.file_path
     if files == None:
         files = rawseq
-    logging.info(
-            "\nRawseq path: %s\nRawfq  path: %s\nCleanfq path: %s\nRawout path: %s\nRuninfo path: %s\n%s" % 
-            (rawseq, rawfq, cleanfq, rawout, files, "#"*50))
+
+    # log
+    log = os.path.join(files, "pipeline_RunInfo.log")
+    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s', datefmt='%a, %d %b %Y %H:%M:%S', filename=log, filemode='a')
+    logging.info("\nRawseq path: %s\nRawfq  path: %s\nCleanfq path: %s\nRawout path: %s\nRuninfo path: %s\n%s" % (rawseq, rawfq, cleanfq, rawout, files, "#" * 50))
     
     # bcl2fastq
     lane_s = options.lane_start
