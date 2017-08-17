@@ -51,7 +51,10 @@ def cfdna2gdna():
             sys.argv[7], sys.argv[8], sys.argv[9], sys.argv[10], sys.argv[11])
 #    bamQC_dir = "%s/BamQC" % inpath
 #    if not os.path.exists(bamQC_dir):os.mkdir(bamQC_dir)
-    outpath = "{0}/BamQC".format(inpath)
+    if len(sys.argv) == 13:
+        outpath = sys.argv[12]
+    else:
+        outpath = "{0}/BamQC".format(inpath)
     if not os.path.exists(outpath):os.mkdir(outpath)
     argss = [(inpath,bed,exonbed,t,ref,gR1,gR2,gID,outpath), (inpath,bed,exonbed,t,ref,cfR1,cfR2,cfID,outpath)]
     p = Pool()
@@ -98,7 +101,10 @@ def ffpe():
             sys.argv[2],sys.argv[3],sys.argv[4],sys.argv[5],sys.argv[6],sys.argv[7],sys.argv[8])
 #    bamQC_dir = "%s/BamQC" % inpath
 #    if not os.path.exists(bamQC_dir):os.mkdir(bamQC_dir)
-    outpath = "{0}/BamQC".format(inpath)
+    if len(sys.argv) == 10:
+        outpath = sys.argv[9]
+    else:
+        outpath = "{0}/BamQC".format(inpath)
     if not os.path.exists(outpath):os.mkdir(outpath)
     bam((inpath,bed,exonbed,t,ref,R1,R2,sampleID,outpath))
     cov_sort = "%s/%s_sort.txt" % (outpath,sampleID)
@@ -127,7 +133,7 @@ def ffpe():
     os.system("rm -rf %s/*_templen.txt" % outpath)
 
 if __name__ == "__main__":
-    if len(sys.argv) == 12:
+    if len(sys.argv) >= 12:
         cfdna2gdna()
     else:
         ffpe()
